@@ -46,3 +46,37 @@ export const deleteAppointment = createAsyncThunk(
     }
 );
 
+//verify otp 
+export const verifyOtpAndBook = createAsyncThunk(
+  "verifyOtpAndBook",
+  async ({ userId, doctorId, date, timeSlot, otp }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/verify-otp`, {
+        userId,
+        doctorId,
+        date,
+        timeSlot,
+        otp
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  }
+);
+
+//monthStatus
+export const GetMonthStatus = createAsyncThunk(
+  "getMonthStatus",
+  async ({ doctorId, year, month }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_URL}/getMonthStatus`, {
+        params: { doctorId, year, month }
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  }
+);
+

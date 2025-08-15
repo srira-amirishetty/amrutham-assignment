@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAppointments,createAppointment,deleteAppointment } from "../API/Appointment";
+import { fetchAppointments,createAppointment,deleteAppointment,verifyOtpAndBook,GetMonthStatus } from "../API/Appointment";
 
 const initialState = {
   data: [], // Align with array structure
@@ -52,7 +52,32 @@ const AppointmentSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+      .addCase(verifyOtpAndBook.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyOtpAndBook.fulfilled, (state, action) => {
+        state.loading = false;
+        state.verifyOtpAndBook = [action.payload]; // Flat business object array
+        state.error = null;
+      })
+      .addCase(verifyOtpAndBook.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(GetMonthStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(GetMonthStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        state.GetmonthStatus = [action.payload]; // Flat business object array
+        state.error = null;
+      })
+      .addCase(GetMonthStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
   },
 });
 

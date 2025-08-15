@@ -34,17 +34,37 @@ export default function TimeSlots({ predefinedSlots, bookedSlots, selectedSlot, 
           date: format(selectedDate, "yyyy-MM-dd"),
           timeSlot: slotToCancel,
         })
-      ).unwrap();
+      )
 
+      console.log("response",res)
+      
+      if(res?.payload?.success === true){
       setSuccessMessage("Appointment cancelled successfully!");
       setTimeout(() => {
         setSuccessMessage("");
         setShowCancelModal(false);
-        
       }, 1500);
       await dispatch(fetchAppointments({doctorId,date:format(selectedDate, "yyyy-MM-dd")}))
+    }else{
+      if(res?.payload?.message === "You can only cancel appointments more than 24 hours in advance." ){
+        setSuccessMessage("You can only cancel appointments more than 24 hours in advance.");
+        setTimeout(() => {
+        setSuccessMessage("");
+        setShowCancelModal(false);
+      }, 2500);
+      await dispatch(fetchAppointments({doctorId,date:format(selectedDate, "yyyy-MM-dd")}))
+      }else{
+        setSuccessMessage("Appointment cancellation failed!");
+              setTimeout(() => {
+        setSuccessMessage("");
+        setShowCancelModal(false);
+      }, 1500);
+      await dispatch(fetchAppointments({doctorId,date:format(selectedDate, "yyyy-MM-dd")}))
+      }
+    }
     } catch (error) {
       console.error("Cancel failed:", error);
+      await dispatch(fetchAppointments({doctorId,date:format(selectedDate, "yyyy-MM-dd")}))
     }
   };
 

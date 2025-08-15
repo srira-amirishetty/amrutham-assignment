@@ -8,7 +8,7 @@ const appointmentSchema = new mongoose.Schema({
   },
   patient: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Patient', 
+    ref: 'User', 
     required: true 
   },
   date: { 
@@ -18,7 +18,10 @@ const appointmentSchema = new mongoose.Schema({
   timeSlot: { 
     type: String, // e.g. "12-01"
     required: true 
-  }
+  },
+  locked: { type: Boolean, default: false },
+  lockExpiresAt: { type: Date }
+
 });
 
 module.exports = mongoose.model('Appointment', appointmentSchema);

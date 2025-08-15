@@ -2,13 +2,29 @@ import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { format, addMonths, startOfMonth, isSameMonth } from "date-fns";
-import { fetchAppointments, createAppointment } from "../../store/API/Appointment";
+import { fetchAppointments, createAppointment,verifyOtpAndBook,GetMonthStatus } from "../../store/API/Appointment";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import TimeSlots from "./Slots";
 
 export default function BookingPage() {
   const { id } = useParams();
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [pendingPayload, setPendingPayload] = useState(null);
+
+  const [bookingData, setBookingData] = useState({});
+
+    const fetchMonthData = async (monthDate) => {
+    const year = monthDate.getFullYear();
+    const month = monthDate.getMonth() + 1; // 1-based
+    const res = await dispatch(GetMonthStatus({doctorId,year,month}))
+    const map = {};
+    res?.payload?.forEach((d) => {
+      map[d.date] = d.status;
+    });
+    setBookingData(map);
+  };
 
   const doctorId = id
   const today = new Date();
@@ -16,14 +32,17 @@ export default function BookingPage() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isodate,setIsoDate] = useState(null)
+  
+  useEffect(() => {
+    fetchMonthData(currentMonth);
+  }, [currentMonth]);
 
   const dispatch = useDispatch();
 
   const appointmentsData = useSelector((state) => state.AppointmentAPI);
   const bookedSlots =
     appointmentsData?.getAppointments?.[0] || [];
-
-    console.log(bookedSlots)
 
   const userId = useSelector((state) => state.LoginAPI?.data?.[0]?.user?._id) || []
   const predefinedSlots = ["10-12", "12-2", "2-4", "4-6"];
@@ -33,13 +52,11 @@ export default function BookingPage() {
       setLoading(true);
       const dateStr = format(selectedDate, "yyyy-MM-dd");
       dispatch(fetchAppointments({ doctorId, date: dateStr }))
-        .finally(() => setLoading(false));
-      // Clear previous selection when date changes
+        .finally(() => setLoading(false))
       setSelectedSlot(null);
     }
   }, [selectedDate, doctorId, dispatch]);
 
-  // Submit handler — send userId, doctorId, date, and selectedSlot
   const handleSubmit = async () => {
     if (!selectedDate || !selectedSlot || !doctorId || !userId) return;
 
@@ -51,19 +68,34 @@ export default function BookingPage() {
     };
 
     try {
-      // If your thunk is createAsyncThunk, unwrap() throws on reject
-      await dispatch(createAppointment(payload)).unwrap?.();
-      alert(
-        `Appointment booked for ${format(selectedDate, "PPP")} at ${selectedSlot}`
-      );
-      // Refresh booked slots for that day
-      await dispatch(fetchAppointments({ doctorId, date: payload.date }));
-      setSelectedSlot(null);
-    } catch (err) {
-      console.error(err);
-      alert(typeof err === "string" ? err : "Failed to book appointment");
-    }
+    await dispatch(createAppointment(payload)).unwrap?.();
+    setPendingPayload(payload); // store for OTP verification
+    setShowOtpModal(true); // open modal
+  } catch (err) {
+    console.error(err);
+    alert(typeof err === "string" ? err : "Failed to send OTP");
+  }
   };
+
+  const handleVerifyOtp = async () => {
+  if (!otp || !pendingPayload) return;
+
+  try {
+    await dispatch(verifyOtpAndBook({ ...pendingPayload, otp })).unwrap?.();
+    alert("Appointment booked successfully!");
+    setShowOtpModal(false);
+    setPendingPayload(null);
+    setOtp("");
+
+    // Refresh booked slots
+    await dispatch(fetchAppointments({ doctorId, date: pendingPayload.date }));
+    setSelectedSlot(null);
+  } catch (err) {
+    console.error(err);
+    alert(typeof err === "string" ? err : "Invalid OTP");
+  }
+};
+
 
   const canSubmit = Boolean(selectedDate && selectedSlot && userId && doctorId);
 
@@ -73,25 +105,52 @@ export default function BookingPage() {
 
       {/* Calendar (forward-only navigation) */}
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-lg font-semibold">
-            {format(currentMonth, "MMMM yyyy")}
-          </span>
-          <Button
-            variant="outline"
-            onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-          >
-            Next Month
-          </Button>
-        </div>
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={(date) => {
-            if (date && isSameMonth(date, currentMonth)) setSelectedDate(date);
-          }}
-          fromDate={today}
-          className="rounded-lg border p-2"
+
+         <Calendar
+            className="rounded-lg border p-2"
+            month={currentMonth}
+            mode="single"
+            selected={selectedDate}
+            onSelect={(date) => {
+              if (date) {
+                setSelectedDate(date);
+              }
+            }}
+            onMonthChange={(monthDate) => setCurrentMonth(monthDate)}
+            components={{
+              DayContent: ({ date }) => {
+                      if (!date) return null;
+                const dateStr = format(date, "yyyy-MM-dd")
+                const status = bookingData[dateStr];
+                setIsoDate(status)
+                let colorClass = "bg-white";
+                if (status === "yellow") colorClass = "bg-yellow-300";
+      
+                else if (status === "orange") colorClass = "bg-orange-400";
+                else if (status === "brown") colorClass = "bg-amber-800 text-white";
+                else if (status === "red") colorClass = "bg-red-500 text-white";
+                const isSelected =
+                selectedDate &&
+      
+                  date.toDateString() === selectedDate.toDateString();
+                const selectedRing = isSelected
+      
+                  ? "ring-2 ring-blue-500"
+                  : "";
+                return (
+      
+                  <div
+                    className={`w-8 h-8 flex items-center justify-center rounded-full ${colorClass} ${selectedRing}`}
+                    style={{
+                backgroundColor: status || "transparent",
+                color: color === "white" ? "black" : "white", // readable text
+              }}
+                  >
+                    {date.getDate()}
+                  </div>
+                );
+              }
+           }}
         />
       </div>
 
@@ -129,6 +188,28 @@ export default function BookingPage() {
           </div>
         </div>
       )}
+
+      {showOtpModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+    <div className="bg-white rounded-lg p-6 shadow-lg w-80">
+      <h2 className="text-lg font-bold mb-4">Enter OTP</h2>
+      <input
+        type="text"
+        value={otp}
+        onChange={(e) => setOtp(e.target.value)}
+        placeholder="Enter OTP"
+        className="border p-2 w-full rounded mb-4"
+      />
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" onClick={() => setShowOtpModal(false)}>
+          Cancel
+        </Button>
+        <Button onClick={handleVerifyOtp}>Verify</Button>
+      </div>
+    </div>
+  </div>
+      )}
+
     </div>
   );
 }
