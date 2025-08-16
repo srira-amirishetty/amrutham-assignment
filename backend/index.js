@@ -17,12 +17,13 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://amrutham-assignment-frontend.onrender.com"
+    "https://amrutham-assignment.onrender.com"
   ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
 
+app.options("*", cors());
 app.use(express.json());
 
 const DATABASE_URL = process.env.DATABASE_URL;
