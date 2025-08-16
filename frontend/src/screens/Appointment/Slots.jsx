@@ -12,7 +12,6 @@ export default function TimeSlots({ predefinedSlots, bookedSlots, selectedSlot, 
   
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.LoginAPI?.data?.[0]?.user?._id) || [] 
-  console.log("user id",userId)
 
   const handleSlotClick = (slot, isBooked) => {
     if (isBooked) {

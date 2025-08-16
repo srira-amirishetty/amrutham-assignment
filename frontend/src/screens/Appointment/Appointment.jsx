@@ -67,6 +67,8 @@ export default function BookingPage() {
       timeSlot: selectedSlot,
     };
 
+
+
     try {
     await dispatch(createAppointment(payload)).unwrap?.();
     setPendingPayload(payload); // store for OTP verification
@@ -96,12 +98,53 @@ export default function BookingPage() {
   }
 };
 
-
   const canSubmit = Boolean(selectedDate && selectedSlot && userId && doctorId);
+
+      useEffect(() => {
+        if (!selectedDate) return;
+          const today = new Date();
+           const now = new Date();
+  today.setHours(0, 0, 0, 0); // reset time to midnight
+
+  const picked = new Date(selectedDate);
+  picked.setHours(0, 0, 0, 0);
+          if (picked < today) {
+    alert("Date already completed");
+    setSelectedDate(null);
+  }
+
+if (selectedSlot !== null){
+if (picked.getTime() === today.getTime()) {
+    const [startHour, endHour] = selectedSlot.split("-").map(Number);
+    const currentHour = now.getHours();
+    console.log(currentHour)
+    const startHour12 = to24Hour(startHour)
+    console.log(startHour12)
+
+    if (currentHour >= startHour12) {
+      alert(`The ${selectedSlot} slot has already passed`);
+      setSelectedSlot(null);
+      return;
+    }
+  }}
+    }, [selectedDate,canSubmit,selectedSlot]);
+
+  function to24Hour(hour) {
+    if (hour === 12) return 12; 
+    if (hour < 9) return hour + 12; 
+    return hour; 
+  }
+
+
 
   return (
     <div className="max-w-3xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6 text-center">Book Appointment</h1>
+
+      {/* //shadcn button for navigation */}
+       <div className="flex mb-2">
+         <button className="bg-neutral-950 hover:bg-neutral-900 text-white font-bold py-2 px-4 rounded-lg" onClick={() => history.push("/")} >See All Appointments</button>
+       </div>
 
       {/* Calendar (forward-only navigation) */}
       <div className="mb-6">

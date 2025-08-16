@@ -80,3 +80,17 @@ export const GetMonthStatus = createAsyncThunk(
   }
 );
 
+//get appointments by userid
+export const getAppointmentByUserId = createAsyncThunk(
+    "getAppointmnetByUserId",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_URL}/getAppointmentsByUserId/${id}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  }
+)
+
+

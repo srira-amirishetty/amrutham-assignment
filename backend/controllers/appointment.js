@@ -157,3 +157,20 @@ exports.getMonthBookingStatus = async (req, res) => {
   res.json(result);
 };
 
+exports.getAppointmentsByUserId = async (req, res) => {
+  try{
+    const {id} =req.params
+    if (!id){
+      return res.status(400).json({ message: "Missing userId" });
+    }
+
+    const appointments = await Appointment.find({
+    patient: id,
+    });
+    res.status(200).json(appointments);
+  }catch(error){
+  console.error(error);
+  res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+}
+
