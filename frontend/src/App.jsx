@@ -5,6 +5,8 @@ import Login from './screens/Login'
 import Register from './screens/Register'
 import DoctorsList from './screens/DoctorsList'
 import Appointment from './screens/Appointment/Appointment'
+import AppointmentList from './screens/Appointment/ListAppointments';
+import AppointmentListForDoctors from './screens/Appointment/ListDoctorAppointments';
 
 const App = () => {
 
@@ -16,6 +18,8 @@ const App = () => {
           <Route path="/register" element={<Register />} />
            <Route path="/doctors" element={<DoctorsList />} />
           <Route path="/appointment/:id" element={<Appointment />} />
+          <Route path='/ListAppointments/:userId' element={<AppointmentList />}/>
+          <Route path='/ListAppointmentsForDoctors/:doctorId' element={<AppointmentListForDoctors />}/>
         </Routes>
       </main>
     </>

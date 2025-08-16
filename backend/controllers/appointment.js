@@ -159,14 +159,18 @@ exports.getMonthBookingStatus = async (req, res) => {
 
 exports.getAppointmentsByUserId = async (req, res) => {
   try{
-    const {id} =req.params
-    if (!id){
+    const {userId} = req.params
+    if (!userId){
       return res.status(400).json({ message: "Missing userId" });
     }
+    console.log(userId)
 
     const appointments = await Appointment.find({
-    patient: id,
-    });
+    patient: userId,
+    }).populate("doctor", "username")
+      .populate("patient", "username")
+      .exec();
+
     res.status(200).json(appointments);
   }catch(error){
   console.error(error);
@@ -174,3 +178,22 @@ exports.getAppointmentsByUserId = async (req, res) => {
   }
 }
 
+exports.getAppointmentsByDoctorId = async (req, res) => {
+  try{
+    const {doctorId} = req.params
+    if (!doctorId){
+      return res.status(400).json({ message: "Missing doctorId" });
+    }
+    console.log(doctorId)
+
+    const appointments = await Appointment.find({doctor: doctorId})
+       .populate("doctor", "username")
+       .populate("patient", "username")
+       .exec();
+
+    res.status(200).json(appointments);
+  }catch(err){
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+  }

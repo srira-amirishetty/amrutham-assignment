@@ -83,9 +83,10 @@ export const GetMonthStatus = createAsyncThunk(
 //get appointments by userid
 export const getAppointmentByUserId = createAsyncThunk(
     "getAppointmnetByUserId",
-  async ({ id }, { rejectWithValue }) => {
+  async ({ userId }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/getAppointmentsByUserId/${id}`);
+      console.log(userId,"inapi")
+      const response = await axios.get(`${API_URL}/getAppointmentsByUserId/${userId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Something went wrong");
@@ -93,4 +94,18 @@ export const getAppointmentByUserId = createAsyncThunk(
   }
 )
 
+//get appointments by doctorID
+export const getAppointmentByDoctorId = createAsyncThunk(
+    "getAppointmnetByDoctorId",
+  async ({ doctorId }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/getAppointmentsByDoctorId/${doctorId}`
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+    }
+)
 

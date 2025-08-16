@@ -49,7 +49,7 @@ function App() {
         if (role === "patient") {
           navigate("/doctors"); // Redirect to subscriber page
         } else if (role === "doctor") {
-          navigate("/bookedAppointments"); // Redirect to admin page
+          navigate(`/ListAppointmentsForDoctors/${userData.user._id}`); // Redirect to admin page
       } else {
         console.error("User data or role is missing:", userData);
         // Optionally handle the case where user data is missing

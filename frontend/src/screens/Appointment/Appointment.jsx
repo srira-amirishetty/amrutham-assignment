@@ -6,9 +6,11 @@ import { fetchAppointments, createAppointment,verifyOtpAndBook,GetMonthStatus } 
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import TimeSlots from "./Slots";
+import { useNavigate } from "react-router-dom";
 
 export default function BookingPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otp, setOtp] = useState("");
   const [pendingPayload, setPendingPayload] = useState(null);
@@ -141,12 +143,10 @@ if (picked.getTime() === today.getTime()) {
     <div className="max-w-3xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6 text-center">Book Appointment</h1>
 
-      {/* //shadcn button for navigation */}
-       <div className="flex mb-2">
+       <div className="flex mb-2" onClick={()=>navigate(`/ListAppointments/${userId}`)} >
          <button className="bg-neutral-950 hover:bg-neutral-900 text-white font-bold py-2 px-4 rounded-lg" onClick={() => history.push("/")} >See All Appointments</button>
        </div>
 
-      {/* Calendar (forward-only navigation) */}
       <div className="mb-6">
 
          <Calendar
