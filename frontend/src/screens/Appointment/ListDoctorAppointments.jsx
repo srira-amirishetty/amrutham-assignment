@@ -60,7 +60,7 @@ export default function AppointmentListForDoctors() {
             <TableBody>
               {appointments.map((appt) => (
                 <TableRow key={appt.id}>
-                  <TableCell className="font-medium">{appt?.doctor?.username}</TableCell>
+                  <TableCell className="font-medium">{appt?.patient?.username}</TableCell>
                   <TableCell>
                     {new Date(appt.date).toLocaleDateString("en-IN", {
                       day: "2-digit",

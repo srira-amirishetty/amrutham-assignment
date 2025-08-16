@@ -1,6 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const token = JSON.parse(localStorage.getItem("user"))?.[0].token
+console.log(token)
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const fetchAppointments = createAsyncThunk(
@@ -8,7 +11,10 @@ export const fetchAppointments = createAsyncThunk(
   async ({doctorId, date}, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_URL}/getAllAppointments`, {
-        params: { doctorId, date }
+        params: { doctorId, date },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
       return response.data;
     } catch (error) {
@@ -23,7 +29,10 @@ export const createAppointment = createAsyncThunk(
   async (appointmentData, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${API_URL}/create-appointment`, appointmentData, {
-        params: appointmentData
+        params: appointmentData,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
       return response.data;
     } catch (error) {
@@ -38,7 +47,11 @@ export const deleteAppointment = createAsyncThunk(
   async ({doctorId, userId, date, timeSlot}, { rejectWithValue }) => {
     try {
       console.log(doctorId, userId, date, timeSlot);
-      const response = await axios.delete(`${API_URL}/delete-appointment`, {data : {doctorId, userId, date, timeSlot}});
+      const response = await axios.delete(`${API_URL}/delete-appointment`, {data : {doctorId, userId, date, timeSlot},
+      headers: {
+          Authorization: `Bearer ${token}`
+        }},
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Something went wrong");
@@ -56,8 +69,14 @@ export const verifyOtpAndBook = createAsyncThunk(
         doctorId,
         date,
         timeSlot,
-        otp
-      });
+        otp,
+        
+      },{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Something went wrong");
@@ -71,7 +90,10 @@ export const GetMonthStatus = createAsyncThunk(
   async ({ doctorId, year, month }, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_URL}/getMonthStatus`, {
-        params: { doctorId, year, month }
+        params: { doctorId, year, month },
+          headers:{
+          Authorization: `Bearer ${token}`
+        }
       });
       return response.data;
     } catch (error) {
@@ -86,7 +108,11 @@ export const getAppointmentByUserId = createAsyncThunk(
   async ({ userId }, { rejectWithValue }) => {
     try {
       console.log(userId,"inapi")
-      const response = await axios.get(`${API_URL}/getAppointmentsByUserId/${userId}`);
+      const response = await axios.get(`${API_URL}/getAppointmentsByUserId/${userId}`,{
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Something went wrong");
@@ -100,7 +126,10 @@ export const getAppointmentByDoctorId = createAsyncThunk(
   async ({ doctorId }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_URL}/getAppointmentsByDoctorId/${doctorId}`
+        `${API_URL}/getAppointmentsByDoctorId/${doctorId}`,{
+          headers:{
+            Authorization: `Bearer ${token}`
+        }}
       );
       return response.data;
     } catch (error) {

@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const appointments = require('../controllers/appointment');
+const authenticateJWT = require('../middlewares/jwt');
 
-router.post('/create-appointment',appointments.CreateAppointment);
-router.get('/getAllAppointments',appointments.GetAppointments);
-router.delete('/delete-appointment', appointments.DeleteAppointment);
-router.post('/verify-otp', appointments.verifyOtpAndBook);
-router.get('/getMonthStatus',appointments.getMonthBookingStatus)
-router.get('/getAppointmentsByUserId/:userId',appointments.getAppointmentsByUserId)
+router.post('/create-appointment',authenticateJWT,appointments.CreateAppointment);
+router.get('/getAllAppointments',authenticateJWT,appointments.GetAppointments);
+router.delete('/delete-appointment',authenticateJWT, appointments.DeleteAppointment);
+router.post('/verify-otp',authenticateJWT, appointments.verifyOtpAndBook);
+router.get('/getMonthStatus',authenticateJWT,appointments.getMonthBookingStatus)
+router.get('/getAppointmentsByUserId/:userId',authenticateJWT,appointments.getAppointmentsByUserId)
 router.get('/getAppointmentsByDoctorId/:doctorId',appointments.getAppointmentsByDoctorId)
 
 module.exports = router;

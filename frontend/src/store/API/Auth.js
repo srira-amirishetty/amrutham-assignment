@@ -7,7 +7,13 @@ export const userRegister = createAsyncThunk(
   "user/register",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, userData);
+      const response = await axios.post(`${API_URL}/auth/register`, userData,
+        {
+          headers:{
+          Authorization: `Bearer ${token}`
+        }
+        }
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Something went wrong");
