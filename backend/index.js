@@ -13,7 +13,16 @@ const appointmentRoutes = require('./routes/appointment')
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://amrutham-assignment-frontend.onrender.com"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 const DATABASE_URL = process.env.DATABASE_URL;
