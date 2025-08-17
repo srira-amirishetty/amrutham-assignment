@@ -17,7 +17,7 @@ Created Doctor Appointment Booking Platform
 
 ## <a name="features">🔋 Features</a>
 
-👉 **Register & Login **: User can register as user or Doctor, JWT authentication and authorization implemented.
+👉 **Register&Login**: User can register as user or Doctor, JWT authentication and authorization implemented.
 
 👉 **Appointment Calendar**: Appointment can be booked by selecting date in calendar and time slot then OTP verification through email.
 
@@ -44,13 +44,13 @@ Make sure you have the following installed on your machine:
 git clone https://github.com/srira-amirishetty/amrutham-assignment.git
 ```
 
-### Frontend Setup
+**Frontend Setup**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-### Backend Setup
+**Backend Setup**
 ```bash
 cd backend
 npm install
