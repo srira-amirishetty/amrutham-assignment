@@ -15,12 +15,9 @@ const errorHandler = require('./middlewares/errorHandler');
 const app = express();
 
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://amrutham-assignment.onrender.com"
-  ],
-  credentials: true
-}));
+    origin: '*',
+    credentials: true
+}))
 
 app.use(express.json());
 
